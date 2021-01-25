@@ -1,30 +1,39 @@
 import express from 'express'
 import cors from 'cors'
+import * as WebSocket from 'ws'
 
 import { env } from './utils/env'
 import sequelize from './utils/database'
 import { CounterController } from './controllers/counter'
 
 const app = express()
+const wss = new WebSocket.Server({ noServer: true })
 
 // Enable CORS
 app.use(cors())
 
-// GET method route
-app.get('/', async function(req, res) {
-  // Get current number
+const getNumberAndBroadcast = async () => {
   const currentNumber = await CounterController.get()
-  res.json({ currentNumber })
-})
 
-// POST method route
-app.post('/', async function(req, res) {
-  // Increment counter
-  await CounterController.increment()
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(currentNumber)
+    }
+  })
+}
 
+wss.on('connection', async (socket: WebSocket) => {
   // Get current number
-  const currentNumber = await CounterController.get()
-  res.json({ currentNumber })
+  // TODO: send only to new connection
+  getNumberAndBroadcast()
+
+  socket.on('message', async () => {
+    // Increment counter
+    await CounterController.increment()
+
+    // and broadcast the new number
+    getNumberAndBroadcast()
+  })
 })
 
 const main = async () => {
@@ -33,8 +42,15 @@ const main = async () => {
     await sequelize.sync({ force: true })
 
     // Start server
-    app.listen(env('API_PORT'), () => {
+    const server = app.listen(env('API_PORT'), () => {
       console.log('\x1b[33m%s\x1b[0m', `Server is running at https://localhost:${env('API_PORT')}`)
+    })
+
+    // Connect websocket server
+    server.on('upgrade', (request, socket, head) => {
+      wss.handleUpgrade(request, socket, head, socket => {
+        wss.emit('connection', socket, request)
+      })
     })
   } catch (error) {
     console.log(error)
