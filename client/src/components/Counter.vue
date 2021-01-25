@@ -9,6 +9,7 @@
 import Vue from 'vue'
 
 type State = {
+  connection: WebSocket | null
   count: number
 }
 
@@ -16,20 +17,36 @@ export default Vue.extend({
   name: 'Counter',
   data(): State {
     return {
+      connection: null,
       count: 0,
     }
   },
   methods: {
-    async increment() {
-      const response = await fetch('http://localhost:8000/', { method: 'POST' })
-      const { currentNumber } = await response.json()
-      this.count = currentNumber
+    increment() {
+      this.connection.send('increment')
     },
   },
-  async mounted() {
-    const response = await fetch('http://localhost:8000/')
-    const { currentNumber } = await response.json()
-    this.count = currentNumber
+  mounted() {
+    // Create WebSocket connection
+    this.connection = new WebSocket('ws://localhost:8000')
+
+    // Connection opened
+    this.connection.addEventListener('open', () => {
+      console.log('Successfully connected to websocket server. Waiting for messages...')
+    })
+
+    // Listen for messages
+    this.connection.addEventListener('message', (event: MessageEvent) => {
+      this.count = event.data
+    })
+
+    // Handle errors
+    this.connection.addEventListener('error', (event: Event) => {
+      console.error('WebSocket error observed:', event)
+    })
+  },
+  destroyed() {
+    this.connection.close()
   },
 })
 </script>
