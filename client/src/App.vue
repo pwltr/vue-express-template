@@ -24,6 +24,7 @@ export default Vue.extend({
   --clr-primary-light: #00d492;
   --clr-primary-dark: #00aa74;
   --clr-monochrome-lightest: #ffffff;
+  --clr-monochrome-light: #adadad;
   --clr-monochrome-medium: #363636;
   --clr-alert: #ee0000;
 

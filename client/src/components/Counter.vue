@@ -2,6 +2,13 @@
   <div class="Counter">
     <div class="Counter__number">Current Number: {{ count }}</div>
     <button class="Counter__button" @click="increment">Increment</button>
+
+    <div class="Counter__status">
+      <transition name="fade">
+        <div class="Counter__success" v-if="status === 'success'">Connection established</div>
+      </transition>
+      <div class="Counter__error" v-if="status === 'error'">Connection could not be established</div>
+    </div>
   </div>
 </template>
 
@@ -10,6 +17,7 @@ import Vue from 'vue'
 
 type State = {
   connection: WebSocket | null
+  status: 'initialized' | 'success' | 'error'
   count: number
 }
 
@@ -18,6 +26,7 @@ export default Vue.extend({
   data(): State {
     return {
       connection: null,
+      status: 'initialized',
       count: 0,
     }
   },
@@ -33,6 +42,7 @@ export default Vue.extend({
     // Connection opened
     this.connection.addEventListener('open', () => {
       console.log('Successfully connected to websocket server. Waiting for messages...')
+      this.status = 'success'
     })
 
     // Listen for messages
@@ -43,10 +53,12 @@ export default Vue.extend({
     // Handle errors
     this.connection.addEventListener('error', (event: Event) => {
       console.error('WebSocket error observed:', event)
+      this.status = 'error'
     })
   },
   destroyed() {
     this.connection.close()
+    this.status = 'initialized'
   },
 })
 </script>
@@ -64,6 +76,20 @@ export default Vue.extend({
 
 .Counter__button {
   margin-top: 1rem;
+}
+
+.Counter__status {
+  font-size: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+.Counter__success {
+  color: var(--clr-monochrome-light);
+  opacity: 0;
+}
+
+.Counter__error {
+  color: var(--clr-alert);
 }
 
 button {
@@ -91,5 +117,13 @@ button:hover {
 
 button:active {
   background: var(--clr-primary-dark);
+}
+
+.fade-enter-active {
+  transition: all 3s ease;
+}
+
+.fade-enter {
+  opacity: 1;
 }
 </style>
