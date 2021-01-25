@@ -1,0 +1,27 @@
+{
+  "name": "morpher-coding-challenge",
+  "version": "1.0.0",
+  "description": "Morpher Coding Challenge",
+  "scripts": {
+    "start": "npm-run-all --parallel start:server start:client",
+    "start:client": "cd client && npm start",
+    "start:server": "cd server && npm start",
+    "setup": "npm install && cd server && npm install && cd ../client && npm install",
+    "pre-commit": "cd server && npm run pre-commit && cd ../client && npm run pre-commit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pwltr/morpher-coding-challenge.git"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "^4.3.8",
+    "npm-run-all": "^4.1.5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run pre-commit"
+    }
+  }
+}
