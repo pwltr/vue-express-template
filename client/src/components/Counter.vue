@@ -8,17 +8,28 @@
 <script lang="ts">
 import Vue from 'vue'
 
+type State = {
+  count: number
+}
+
 export default Vue.extend({
   name: 'Counter',
-  data() {
+  data(): State {
     return {
       count: 0,
     }
   },
   methods: {
-    increment() {
-      this.count = this.count + 1
+    async increment() {
+      const response = await fetch('http://localhost:8000/', { method: 'POST' })
+      const { currentNumber } = await response.json()
+      this.count = currentNumber
     },
+  },
+  async mounted() {
+    const response = await fetch('http://localhost:8000/')
+    const { currentNumber } = await response.json()
+    this.count = currentNumber
   },
 })
 </script>
