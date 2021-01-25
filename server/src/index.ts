@@ -1,9 +1,13 @@
 import express from 'express'
+import cors from 'cors'
 
 import { env } from './utils/env'
 import sequelize from './utils/database'
 
 const app = express()
+
+// Enable CORS
+app.use(cors())
 
 // GET method route
 app.get('/', function(req, res) {
