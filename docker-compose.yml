@@ -14,6 +14,9 @@ services:
     command: npm start
     tty: true
     stdin_open: true
+    volumes:
+      - ./client/:/client/
+      - /client/node_modules
 
   server:
     restart: unless-stopped
