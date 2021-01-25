@@ -31,6 +31,8 @@ Frontend is running on `http://localhost:8080`
 
 Backend is listening on `http://localhost:8000`
 
+Adminer is running on `http://localhost:8888`
+
 ## Running for development
 
 For a more rapid development experience it often makes sense to run the project directly on your system.
