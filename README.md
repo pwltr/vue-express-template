@@ -1,4 +1,4 @@
-# Morpher Coding Challenge
+# vue-express-template
 
 A project consisting of a Vue frontend and a REST API using Node/Express backend.
 
